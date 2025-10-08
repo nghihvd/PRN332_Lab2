@@ -12,18 +12,30 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Database
         public DbSet<Product> Products { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            // Decimal precision mapping to avoid truncation
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Price)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Order>()
+                .Property(o => o.TotalAmount)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<OrderDetail>()
+                .Property(od => od.UnitPrice)
+                .HasColumnType("decimal(18,2)");
+
             // Seed Categories
             modelBuilder.Entity<Category>().HasData(
-                new Category { CategoryId = "11111111-1111-1111-1111-111111111111", Name = "Coffee Beans", Description = "Various coffee beans", CreatedDate = DateTime.Now.AddMonths(-5) },
-                new Category { CategoryId = "22222222-2222-2222-2222-222222222222", Name = "Coffee Machines", Description = "Brewing machines", CreatedDate = DateTime.Now.AddMonths(-4) },
-                new Category { CategoryId = "33333333-3333-3333-3333-333333333333", Name = "Accessories", Description = "Coffee accessories", CreatedDate = DateTime.Now.AddMonths(-3) },
-                new Category { CategoryId = "44444444-4444-4444-4444-444444444444", Name = "Tea", Description = "Assorted tea leaves", CreatedDate = DateTime.Now.AddMonths(-2) },
-                new Category { CategoryId = "55555555-5555-5555-5555-555555555555", Name = "Snacks", Description = "Coffee snacks", CreatedDate = DateTime.Now.AddMonths(-1) }
+                new Category { CategoryId = "11111111-1111-1111-1111-111111111111", Name = "Coffee Beans", Description = "Various coffee beans", CreatedDate = new DateTime(2025, 1, 1) },
+                new Category { CategoryId = "22222222-2222-2222-2222-222222222222", Name = "Coffee Machines", Description = "Brewing machines", CreatedDate = new DateTime(2025, 2, 1) },
+                new Category { CategoryId = "33333333-3333-3333-3333-333333333333", Name = "Accessories", Description = "Coffee accessories", CreatedDate = new DateTime(2025, 3, 1) },
+                new Category { CategoryId = "44444444-4444-4444-4444-444444444444", Name = "Tea", Description = "Assorted tea leaves", CreatedDate = new DateTime(2025, 4, 1) },
+                new Category { CategoryId = "55555555-5555-5555-5555-555555555555", Name = "Snacks", Description = "Coffee snacks", CreatedDate = new DateTime(2025, 5, 1) }
             );
 
             // Seed Products
@@ -37,11 +49,11 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Database
 
             // Seed Orders
             modelBuilder.Entity<Order>().HasData(
-                new Order { OrderId = "bbbbbbb1-bbbb-bbbb-bbbb-bbbbbbbbbbb1", UserId = "user01", OrderDate = DateTime.Now.AddDays(-10), Status = "Completed" },
-                new Order { OrderId = "bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbb2", UserId = "user02", OrderDate = DateTime.Now.AddDays(-9), Status = "Pending" },
-                new Order { OrderId = "bbbbbbb3-bbbb-bbbb-bbbb-bbbbbbbbbbb3", UserId = "user03", OrderDate = DateTime.Now.AddDays(-8), Status = "Shipped" },
-                new Order { OrderId = "bbbbbbb4-bbbb-bbbb-bbbb-bbbbbbbbbbb4", UserId = "user01", OrderDate = DateTime.Now.AddDays(-7), Status = "Cancelled" },
-                new Order { OrderId = "bbbbbbb5-bbbb-bbbb-bbbb-bbbbbbbbbbb5", UserId = "user04", OrderDate = DateTime.Now.AddDays(-6), Status = "Completed" }
+                new Order { OrderId = "bbbbbbb1-bbbb-bbbb-bbbb-bbbbbbbbbbb1", UserId = "user01", OrderDate = new DateTime(2025, 6, 1), Status = "Completed", PaymentId = "pay-cc" },
+                new Order { OrderId = "bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbb2", UserId = "user02", OrderDate = new DateTime(2025, 6, 2), Status = "Pending", PaymentId = "pay-pp" },
+                new Order { OrderId = "bbbbbbb3-bbbb-bbbb-bbbb-bbbbbbbbbbb3", UserId = "user03", OrderDate = new DateTime(2025, 6, 3), Status = "Shipped", PaymentId = "pay-cc" },
+                new Order { OrderId = "bbbbbbb4-bbbb-bbbb-bbbb-bbbbbbbbbbb4", UserId = "user01", OrderDate = new DateTime(2025, 6, 4), Status = "Cancelled", PaymentId = "pay-na" },
+                new Order { OrderId = "bbbbbbb5-bbbb-bbbb-bbbb-bbbbbbbbbbb5", UserId = "user04", OrderDate = new DateTime(2025, 6, 5), Status = "Completed", PaymentId = "pay-dc" }
             );
 
             // Seed OrderDetails
@@ -53,13 +65,13 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Database
                 new OrderDetail { OrderDetailId = "ccccccc5-cccc-cccc-cccc-ccccccccccc5", OrderId = "bbbbbbb5-bbbb-bbbb-bbbb-bbbbbbbbbbb5", ProductId = "aaaaaaa5-aaaa-aaaa-aaaa-aaaaaaaaaaa5", Quantity = 5, UnitPrice = 8.00m }
             );
 
-            // Seed Payments
+            // Seed Payment methods (catalog)
             modelBuilder.Entity<Payment>().HasData(
-                new Payment { PaymentId = "ddddddd1-dddd-dddd-dddd-dddddddddddd1", OrderId = "bbbbbbb1-bbbb-bbbb-bbbb-bbbbbbbbbbb1", Amount = 76.00m, PaymentDate = DateTime.Now.AddDays(-9), PaymentMethod = "Credit Card" },
-                new Payment { PaymentId = "ddddddd2-dddd-dddd-dddd-dddddddddddd2", OrderId = "bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbb2", Amount = 250.00m, PaymentDate = DateTime.Now.AddDays(-8), PaymentMethod = "PayPal" },
-                new Payment { PaymentId = "ddddddd3-dddd-dddd-dddd-dddddddddddd3", OrderId = "bbbbbbb3-bbbb-bbbb-bbbb-bbbbbbbbbbb3", Amount = 36.00m, PaymentDate = DateTime.Now.AddDays(-7), PaymentMethod = "Credit Card" },
-                new Payment { PaymentId = "ddddddd4-dddd-dddd-dddd-dddddddddddd4", OrderId = "bbbbbbb5-bbbb-bbbb-bbbb-bbbbbbbbbbb5", Amount = 40.00m, PaymentDate = DateTime.Now.AddDays(-5), PaymentMethod = "Debit Card" },
-                new Payment { PaymentId = "ddddddd5-dddd-dddd-dddd-dddddddddddd5", OrderId = "bbbbbbb4-bbbb-bbbb-bbbb-bbbbbbbbbbb4", Amount = 0.00m, PaymentDate = DateTime.Now.AddDays(-6), PaymentMethod = "N/A" }// Cancelled order
+                new Payment { PaymentId = "pay-cc", PaymentMethod = "Credit Card", Status = "Active" },
+                new Payment { PaymentId = "pay-pp", PaymentMethod = "PayPal", Status = "Active" },
+                new Payment { PaymentId = "pay-dc", PaymentMethod = "Debit Card", Status = "Active" },
+                new Payment { PaymentId = "pay-cash", PaymentMethod = "Cash", Status = "Active" },
+                new Payment { PaymentId = "pay-na", PaymentMethod = "N/A", Status = "Inactive" }
             );
         }
 

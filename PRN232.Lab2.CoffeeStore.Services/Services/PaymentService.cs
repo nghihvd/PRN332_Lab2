@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PRN232.Lab2.CoffeeStore.Repositories.Interfaces.UOW;
 using PRN232.Lab2.CoffeeStore.Repositories.Models;
+using PRN232.Lab2.CoffeeStore.Services.Commons;
 using PRN232.Lab2.CoffeeStore.Services.Interfaces;
 using PRN232.Lab2.CoffeeStore.Services.Models.Requests.Payment;
 using PRN232.Lab2.CoffeeStore.Services.Models.Responses;
@@ -16,33 +17,17 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<PaymentResponseModel> CreatePaymentAsync(CreatePaymentRequestModel request)
+        public async Task<PaymentResponseModel> CreateAsync(CreatePaymentRequestModel request)
         {
             _unitOfWork.BeginTransaction();
             try
             {
-                var orderRepository = _unitOfWork.GetRepository<Order>();
-                var order = await orderRepository.GetByIdAsync(request.OrderId);
-
-                if (order == null)
-                {
-                    throw new KeyNotFoundException("Không tìm thấy đơn hàng.");
-                }
-
-                if (order.Payment != null)
-                {
-                    throw new InvalidOperationException("Đơn hàng đã được thanh toán.");
-                }
-
                 var paymentRepository = _unitOfWork.GetRepository<Payment>();
                 var payment = new Payment
                 {
                     PaymentId = Guid.NewGuid().ToString(),
-                    OrderId = request.OrderId,
-                    Amount = order.TotalAmount,
-                    PaymentDate = DateTime.UtcNow,
                     PaymentMethod = request.PaymentMethod,
-                    Status = "Completed"
+                    Status = request.Status
                 };
 
                 await paymentRepository.AddAsync(payment);
@@ -52,9 +37,6 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                 return new PaymentResponseModel
                 {
                     PaymentId = payment.PaymentId,
-                    OrderId = payment.OrderId,
-                    Amount = payment.Amount,
-                    PaymentDate = payment.PaymentDate,
                     PaymentMethod = payment.PaymentMethod,
                     Status = payment.Status
                 };
@@ -66,22 +48,115 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
             }
         }
 
-        public async Task<PaymentResponseModel?> GetByOrderIdAsync(string orderId)
+        // Removed GetByOrderIdAsync; Payment is now a catalog
+
+        public async Task<PaymentResponseModel?> GetByIdAsync(string id)
         {
-            var paymentRepository = _unitOfWork.GetRepository<Payment>();
-            var payment = await paymentRepository.Entities.FirstOrDefaultAsync(p => p.OrderId == orderId);
+            var repo = _unitOfWork.GetRepository<Payment>();
+            var payment = await repo.Entities
+                .FirstOrDefaultAsync(p => p.PaymentId == id);
 
             if (payment == null) return null;
 
             return new PaymentResponseModel
             {
                 PaymentId = payment.PaymentId,
-                OrderId = payment.OrderId ?? string.Empty,
-                Amount = payment.Amount,
-                PaymentDate = payment.PaymentDate,
                 PaymentMethod = payment.PaymentMethod,
                 Status = payment.Status
             };
+        }
+
+        public async Task<PagedResult<PaymentResponseModel>> GetPagingAsync(PaymentPagingRequestModel request)
+        {
+            var repo = _unitOfWork.GetRepository<Payment>();
+            var query = repo.Entities.AsQueryable();
+            if (!string.IsNullOrEmpty(request.Status))
+            {
+                query = query.Where(p => p.Status == request.Status);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            switch (request.SortBy.ToLower())
+            {
+                case "status":
+                    query = request.IsDescending ? query.OrderByDescending(p => p.Status) : query.OrderBy(p => p.Status);
+                    break;
+                case "paymentmethod":
+                default:
+                    query = request.IsDescending ? query.OrderByDescending(p => p.PaymentMethod) : query.OrderBy(p => p.PaymentMethod);
+                    break;
+            }
+
+            var items = await query
+                .Skip(request.PageIndex * request.PageSize)
+                .Take(request.PageSize)
+                .Select(p => new PaymentResponseModel
+                {
+                    PaymentId = p.PaymentId,
+                    PaymentMethod = p.PaymentMethod,
+                    Status = p.Status
+                })
+                .ToListAsync();
+
+            return new PagedResult<PaymentResponseModel>(items, totalCount, request.PageIndex, request.PageSize);
+        }
+
+        public async Task<PaymentResponseModel> UpdateAsync(string id, UpdatePaymentRequestModel request)
+        {
+            _unitOfWork.BeginTransaction();
+            try
+            {
+                var repo = _unitOfWork.GetRepository<Payment>();
+                var payment = await repo.GetByIdAsync(id);
+                if (payment == null)
+                {
+                    throw new KeyNotFoundException("Không tìm thấy thanh toán.");
+                }
+
+                payment.PaymentMethod = request.PaymentMethod;
+                payment.Status = request.Status;
+
+                await repo.UpdateAsync(payment);
+                await _unitOfWork.SaveAsync();
+                _unitOfWork.CommitTransaction();
+
+                return new PaymentResponseModel
+                {
+                    PaymentId = payment.PaymentId,
+                    PaymentMethod = payment.PaymentMethod,
+                    Status = payment.Status
+                };
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
+        }
+
+        public async Task<bool> DeleteAsync(string id)
+        {
+            _unitOfWork.BeginTransaction();
+            try
+            {
+                var repo = _unitOfWork.GetRepository<Payment>();
+                var payment = await repo.GetByIdAsync(id);
+                if (payment == null)
+                {
+                    return false;
+                }
+
+                await repo.DeleteAsync(payment);
+                await _unitOfWork.SaveAsync();
+                _unitOfWork.CommitTransaction();
+                return true;
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
         }
     }
 }

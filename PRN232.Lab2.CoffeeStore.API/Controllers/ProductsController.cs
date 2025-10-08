@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using PRN232.Lab2.CoffeeStore.Services.Interfaces;
 using PRN232.Lab2.CoffeeStore.Services.Models.Requests.Product;
 
@@ -6,6 +7,7 @@ namespace PRN232.Lab2.CoffeeStore.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;

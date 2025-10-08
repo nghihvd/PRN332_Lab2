@@ -6,6 +6,7 @@ namespace PRN232.Lab2.CoffeeStore.Services.Models.Responses
         public string? UserId { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
+        public string? PaymentId { get; set; }
         public List<OrderDetailResponseModel> OrderDetails { get; set; } = new List<OrderDetailResponseModel>();
         public PaymentResponseModel? Payment { get; set; }
     }

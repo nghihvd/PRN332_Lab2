@@ -17,7 +17,7 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -45,35 +45,35 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
                         new
                         {
                             CategoryId = "11111111-1111-1111-1111-111111111111",
-                            CreatedDate = new DateTime(2025, 5, 3, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(755),
+                            CreatedDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Various coffee beans",
                             Name = "Coffee Beans"
                         },
                         new
                         {
                             CategoryId = "22222222-2222-2222-2222-222222222222",
-                            CreatedDate = new DateTime(2025, 6, 3, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(789),
+                            CreatedDate = new DateTime(2025, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Brewing machines",
                             Name = "Coffee Machines"
                         },
                         new
                         {
                             CategoryId = "33333333-3333-3333-3333-333333333333",
-                            CreatedDate = new DateTime(2025, 7, 3, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(801),
+                            CreatedDate = new DateTime(2025, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Coffee accessories",
                             Name = "Accessories"
                         },
                         new
                         {
                             CategoryId = "44444444-4444-4444-4444-444444444444",
-                            CreatedDate = new DateTime(2025, 8, 3, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(816),
+                            CreatedDate = new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Assorted tea leaves",
                             Name = "Tea"
                         },
                         new
                         {
                             CategoryId = "55555555-5555-5555-5555-555555555555",
-                            CreatedDate = new DateTime(2025, 9, 3, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(825),
+                            CreatedDate = new DateTime(2025, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Coffee snacks",
                             Name = "Snacks"
                         });
@@ -87,6 +87,9 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("PaymentId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -99,13 +102,16 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
 
                     b.HasKey("OrderId");
 
+                    b.HasIndex("PaymentId");
+
                     b.ToTable("Orders");
 
                     b.HasData(
                         new
                         {
                             OrderId = "bbbbbbb1-bbbb-bbbb-bbbb-bbbbbbbbbbb1",
-                            OrderDate = new DateTime(2025, 9, 23, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(1565),
+                            OrderDate = new DateTime(2025, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentId = "pay-cc",
                             Status = "Completed",
                             TotalAmount = 0m,
                             UserId = "user01"
@@ -113,7 +119,8 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
                         new
                         {
                             OrderId = "bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbb2",
-                            OrderDate = new DateTime(2025, 9, 24, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(1590),
+                            OrderDate = new DateTime(2025, 6, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentId = "pay-pp",
                             Status = "Pending",
                             TotalAmount = 0m,
                             UserId = "user02"
@@ -121,7 +128,8 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
                         new
                         {
                             OrderId = "bbbbbbb3-bbbb-bbbb-bbbb-bbbbbbbbbbb3",
-                            OrderDate = new DateTime(2025, 9, 25, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(1656),
+                            OrderDate = new DateTime(2025, 6, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentId = "pay-cc",
                             Status = "Shipped",
                             TotalAmount = 0m,
                             UserId = "user03"
@@ -129,7 +137,8 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
                         new
                         {
                             OrderId = "bbbbbbb4-bbbb-bbbb-bbbb-bbbbbbbbbbb4",
-                            OrderDate = new DateTime(2025, 9, 26, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(1667),
+                            OrderDate = new DateTime(2025, 6, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentId = "pay-na",
                             Status = "Cancelled",
                             TotalAmount = 0m,
                             UserId = "user01"
@@ -137,7 +146,8 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
                         new
                         {
                             OrderId = "bbbbbbb5-bbbb-bbbb-bbbb-bbbbbbbbbbb5",
-                            OrderDate = new DateTime(2025, 9, 27, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(1676),
+                            OrderDate = new DateTime(2025, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PaymentId = "pay-dc",
                             Status = "Completed",
                             TotalAmount = 0m,
                             UserId = "user04"
@@ -217,15 +227,6 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
                     b.Property<string>("PaymentId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("OrderId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -236,57 +237,38 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
 
                     b.HasKey("PaymentId");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique()
-                        .HasFilter("[OrderId] IS NOT NULL");
-
                     b.ToTable("Payments");
 
                     b.HasData(
                         new
                         {
-                            PaymentId = "ddddddd1-dddd-dddd-dddd-dddddddddddd1",
-                            Amount = 76.00m,
-                            OrderId = "bbbbbbb1-bbbb-bbbb-bbbb-bbbbbbbbbbb1",
-                            PaymentDate = new DateTime(2025, 9, 24, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(1783),
+                            PaymentId = "pay-cc",
                             PaymentMethod = "Credit Card",
-                            Status = "Pending"
+                            Status = "Active"
                         },
                         new
                         {
-                            PaymentId = "ddddddd2-dddd-dddd-dddd-dddddddddddd2",
-                            Amount = 250.00m,
-                            OrderId = "bbbbbbb2-bbbb-bbbb-bbbb-bbbbbbbbbbb2",
-                            PaymentDate = new DateTime(2025, 9, 25, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(1789),
+                            PaymentId = "pay-pp",
                             PaymentMethod = "PayPal",
-                            Status = "Pending"
+                            Status = "Active"
                         },
                         new
                         {
-                            PaymentId = "ddddddd3-dddd-dddd-dddd-dddddddddddd3",
-                            Amount = 36.00m,
-                            OrderId = "bbbbbbb3-bbbb-bbbb-bbbb-bbbbbbbbbbb3",
-                            PaymentDate = new DateTime(2025, 9, 26, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(1795),
-                            PaymentMethod = "Credit Card",
-                            Status = "Pending"
-                        },
-                        new
-                        {
-                            PaymentId = "ddddddd4-dddd-dddd-dddd-dddddddddddd4",
-                            Amount = 40.00m,
-                            OrderId = "bbbbbbb5-bbbb-bbbb-bbbb-bbbbbbbbbbb5",
-                            PaymentDate = new DateTime(2025, 9, 28, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(1800),
+                            PaymentId = "pay-dc",
                             PaymentMethod = "Debit Card",
-                            Status = "Pending"
+                            Status = "Active"
                         },
                         new
                         {
-                            PaymentId = "ddddddd5-dddd-dddd-dddd-dddddddddddd5",
-                            Amount = 0.00m,
-                            OrderId = "bbbbbbb4-bbbb-bbbb-bbbb-bbbbbbbbbbb4",
-                            PaymentDate = new DateTime(2025, 9, 27, 22, 18, 50, 587, DateTimeKind.Local).AddTicks(1806),
+                            PaymentId = "pay-cash",
+                            PaymentMethod = "Cash",
+                            Status = "Active"
+                        },
+                        new
+                        {
+                            PaymentId = "pay-na",
                             PaymentMethod = "N/A",
-                            Status = "Pending"
+                            Status = "Inactive"
                         });
                 });
 
@@ -376,6 +358,51 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PRN232.Lab2.CoffeeStore.Repositories.Models.User", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("PRN232.Lab2.CoffeeStore.Repositories.Models.Order", b =>
+                {
+                    b.HasOne("PRN232.Lab2.CoffeeStore.Repositories.Models.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId");
+
+                    b.Navigation("Payment");
+                });
+
             modelBuilder.Entity("PRN232.Lab2.CoffeeStore.Repositories.Models.OrderDetail", b =>
                 {
                     b.HasOne("PRN232.Lab2.CoffeeStore.Repositories.Models.Order", "Order")
@@ -389,15 +416,6 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("PRN232.Lab2.CoffeeStore.Repositories.Models.Payment", b =>
-                {
-                    b.HasOne("PRN232.Lab2.CoffeeStore.Repositories.Models.Order", "Order")
-                        .WithOne("Payment")
-                        .HasForeignKey("PRN232.Lab2.CoffeeStore.Repositories.Models.Payment", "OrderId");
-
-                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("PRN232.Lab2.CoffeeStore.Repositories.Models.Product", b =>
@@ -417,8 +435,6 @@ namespace PRN232.Lab2.CoffeeStore.Repositories.Migrations
             modelBuilder.Entity("PRN232.Lab2.CoffeeStore.Repositories.Models.Order", b =>
                 {
                     b.Navigation("OrderDetails");
-
-                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("PRN232.Lab2.CoffeeStore.Repositories.Models.Product", b =>

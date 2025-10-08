@@ -3,13 +3,7 @@
     public class Payment
     {
         public string PaymentId { get; set; } = Guid.NewGuid().ToString();
-        public string? OrderId { get; set; }
-        public decimal Amount { get; set; }
-        public DateTime PaymentDate { get; set; }
         public string PaymentMethod { get; set; } = null!;
-        public string Status { get; set; } = "Pending"; // e.g., Completed, Pending, Failed
-
-        // Navigation
-        public Order? Order { get; set; }
+        public string Status { get; set; } = "Active"; // e.g., Active/Inactive for payment method
     }
 }

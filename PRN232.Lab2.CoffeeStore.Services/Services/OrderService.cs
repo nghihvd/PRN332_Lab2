@@ -25,6 +25,7 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                 var orderRepository = _unitOfWork.GetRepository<Order>();
                 var productRepository = _unitOfWork.GetRepository<Product>();
                 var orderDetailRepository = _unitOfWork.GetRepository<OrderDetail>();
+                var paymentRepository = _unitOfWork.GetRepository<Payment>();
 
                 decimal totalAmount = 0;
                 var orderDetails = new List<OrderDetail>();
@@ -48,12 +49,23 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                     totalAmount += orderDetail.Quantity * orderDetail.UnitPrice;
                 }
 
+                // Validate payment method if provided
+                if (!string.IsNullOrEmpty(request.PaymentId))
+                {
+                    var paymentMethod = await paymentRepository.GetByIdAsync(request.PaymentId);
+                    if (paymentMethod == null)
+                    {
+                        throw new KeyNotFoundException("Phương thức thanh toán không hợp lệ.");
+                    }
+                }
+
                 var order = new Order
                 {
                     OrderId = Guid.NewGuid().ToString(),
                     UserId = request.UserId,
                     OrderDate = DateTime.UtcNow,
                     TotalAmount = totalAmount,
+                    PaymentId = request.PaymentId,
                     OrderDetails = orderDetails
                 };
 
@@ -87,6 +99,7 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                 UserId = order.UserId,
                 OrderDate = order.OrderDate,
                 TotalAmount = order.TotalAmount,
+                PaymentId = order.PaymentId,
                 OrderDetails = order.OrderDetails?.Select(od => new OrderDetailResponseModel
                 {
                     OrderDetailId = od.OrderDetailId,
@@ -96,15 +109,7 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                     UnitPrice = od.UnitPrice,
                     Total = od.Quantity * od.UnitPrice
                 }).ToList() ?? new List<OrderDetailResponseModel>(),
-                Payment = order.Payment == null ? null : new PaymentResponseModel
-                {
-                    PaymentId = order.Payment.PaymentId,
-                    OrderId = order.Payment.OrderId ?? string.Empty,
-                    Amount = order.Payment.Amount,
-                    PaymentDate = order.Payment.PaymentDate,
-                    PaymentMethod = order.Payment.PaymentMethod,
-                    Status = order.Payment.Status
-                }
+                Payment = null // Order now references payment method by PaymentId; no transaction details here
             };
         }
 
@@ -113,7 +118,6 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
             var orderRepository = _unitOfWork.GetRepository<Order>();
             var query = orderRepository.Entities
                 .Include(o => o.OrderDetails)
-                .Include(o => o.Payment)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(request.UserId))
@@ -147,12 +151,7 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                     UserId = o.UserId,
                     OrderDate = o.OrderDate,
                     TotalAmount = o.TotalAmount,
-                    Payment = o.Payment == null ? null : new PaymentResponseModel
-                    {
-                        PaymentId = o.Payment.PaymentId,
-                        Status = o.Payment.Status,
-                        PaymentMethod = o.Payment.PaymentMethod
-                    }
+                    PaymentId = o.PaymentId
                 })
                 .ToListAsync();
 
@@ -171,10 +170,7 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                     return false;
                 }
 
-                if (order.Payment != null)
-                {
-                    throw new InvalidOperationException("Không thể xóa đơn hàng đã thanh toán.");
-                }
+                // No longer blocking delete based on payment; Order now references a payment method
 
                 var orderDetailRepository = _unitOfWork.GetRepository<OrderDetail>();
                 var orderDetails = await orderDetailRepository.Entities
@@ -210,13 +206,11 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                     throw new KeyNotFoundException("Không tìm thấy đơn hàng.");
                 }
 
-                if (order.Payment != null)
-                {
-                    throw new InvalidOperationException("Không thể cập nhật đơn hàng đã thanh toán.");
-                }
+                // No longer blocking update based on payment; Order now references a payment method
 
                 var productRepository = _unitOfWork.GetRepository<Product>();
                 var orderDetailRepository = _unitOfWork.GetRepository<OrderDetail>();
+                var paymentRepository = _unitOfWork.GetRepository<Payment>();
 
                 // Delete existing order details
                 var existingDetails = await orderDetailRepository.Entities
@@ -251,9 +245,20 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                     totalAmount += orderDetail.Quantity * orderDetail.UnitPrice;
                 }
 
+                // Validate payment method if provided
+                if (!string.IsNullOrEmpty(request.PaymentId))
+                {
+                    var paymentMethod = await paymentRepository.GetByIdAsync(request.PaymentId);
+                    if (paymentMethod == null)
+                    {
+                        throw new KeyNotFoundException("Phương thức thanh toán không hợp lệ.");
+                    }
+                }
+
                 // Update order
                 order.UserId = request.UserId;
                 order.TotalAmount = totalAmount;
+                order.PaymentId = request.PaymentId;
                 order.OrderDetails = orderDetails;
 
                 await orderRepository.UpdateAsync(order);

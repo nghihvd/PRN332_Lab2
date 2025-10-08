@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using PRN232.Lab2.CoffeeStore.Services.Interfaces;
 using PRN232.Lab2.CoffeeStore.Services.Models.Requests.Order;
 
@@ -6,6 +7,7 @@ namespace PRN232.Lab2.CoffeeStore.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
