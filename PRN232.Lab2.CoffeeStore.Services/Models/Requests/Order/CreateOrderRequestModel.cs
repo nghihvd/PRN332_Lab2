@@ -4,7 +4,6 @@ namespace PRN232.Lab2.CoffeeStore.Services.Models.Requests.Order
 {
     public class CreateOrderRequestModel
     {
-        public string? UserId { get; set; }
         public string? PaymentId { get; set; }
 
         [Required]

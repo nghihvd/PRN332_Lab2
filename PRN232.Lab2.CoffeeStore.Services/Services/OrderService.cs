@@ -17,7 +17,7 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<OrderResponseModel> CreateAsync(CreateOrderRequestModel request)
+        public async Task<OrderResponseModel> CreateAsync(CreateOrderRequestModel request, string userId)
         {
             _unitOfWork.BeginTransaction();
             try
@@ -62,7 +62,7 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                 var order = new Order
                 {
                     OrderId = Guid.NewGuid().ToString(),
-                    UserId = request.UserId,
+                    UserId = userId,
                     OrderDate = DateTime.UtcNow,
                     TotalAmount = totalAmount,
                     PaymentId = request.PaymentId,
@@ -194,7 +194,7 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
             }
         }
 
-        public async Task<OrderResponseModel> UpdateAsync(string id, CreateOrderRequestModel request)
+        public async Task<OrderResponseModel> UpdateAsync(string id, CreateOrderRequestModel request, string userId)
         {
             _unitOfWork.BeginTransaction();
             try
@@ -256,7 +256,7 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                 }
 
                 // Update order
-                order.UserId = request.UserId;
+                order.UserId = userId;
                 order.TotalAmount = totalAmount;
                 order.PaymentId = request.PaymentId;
                 order.OrderDetails = orderDetails;

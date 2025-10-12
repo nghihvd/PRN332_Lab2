@@ -30,7 +30,7 @@ namespace PRN232.Lab2.CoffeeStore.API.Controllers
             var payment = await _paymentService.GetByIdAsync(id);
             if (payment == null)
             {
-                return NotFound(new { Message = "Không tìm thấy thanh toán." });
+                return NotFound(new { message = "Không tìm thấy thanh toán." });
             }
             return Ok(payment);
         }
@@ -50,15 +50,15 @@ namespace PRN232.Lab2.CoffeeStore.API.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { Message = ex.Message });
+                return NotFound(new { message = ex.Message });
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception)
             {
-                return StatusCode(500, new { Message = "Đã xảy ra lỗi khi tạo thanh toán." });
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi tạo thanh toán." });
             }
         }
 
@@ -76,11 +76,11 @@ namespace PRN232.Lab2.CoffeeStore.API.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { Message = ex.Message });
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception)
             {
-                return StatusCode(500, new { Message = "Đã xảy ra lỗi khi cập nhật thanh toán." });
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi cập nhật thanh toán." });
             }
         }
 
@@ -92,13 +92,13 @@ namespace PRN232.Lab2.CoffeeStore.API.Controllers
                 var result = await _paymentService.DeleteAsync(id);
                 if (!result)
                 {
-                    return NotFound(new { Message = "Không tìm thấy thanh toán." });
+                    return NotFound(new { message = "Không tìm thấy thanh toán." });
                 }
                 return NoContent();
             }
             catch (Exception)
             {
-                return StatusCode(500, new { Message = "Đã xảy ra lỗi khi xóa thanh toán." });
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi xóa thanh toán." });
             }
         }
     }

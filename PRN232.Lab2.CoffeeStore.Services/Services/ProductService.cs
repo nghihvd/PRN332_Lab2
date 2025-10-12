@@ -106,6 +106,17 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
             _unitOfWork.BeginTransaction();
             try
             {
+                // Kiểm tra CategoryId có tồn tại không
+                if (!string.IsNullOrEmpty(productCreateDto.CategoryId))
+                {
+                    var categoryRepository = _unitOfWork.GetRepository<Category>();
+                    var category = await categoryRepository.GetByIdAsync(productCreateDto.CategoryId);
+                    if (category == null)
+                    {
+                        throw new KeyNotFoundException($"Danh mục với ID {productCreateDto.CategoryId} không tồn tại.");
+                    }
+                }
+
                 var productRepository = _unitOfWork.GetRepository<Product>();
                 var product = new Product
                 {
@@ -141,7 +152,18 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
 
                 if (existingProduct == null)
                 {
-                    throw new KeyNotFoundException($"Product with ID {id} not found.");
+                    throw new KeyNotFoundException($"Không tìm thấy sản phẩm với ID {id}.");
+                }
+
+                // Kiểm tra CategoryId có tồn tại không
+                if (!string.IsNullOrEmpty(productUpdateDto.CategoryId))
+                {
+                    var categoryRepository = _unitOfWork.GetRepository<Category>();
+                    var category = await categoryRepository.GetByIdAsync(productUpdateDto.CategoryId);
+                    if (category == null)
+                    {
+                        throw new KeyNotFoundException($"Danh mục với ID {productUpdateDto.CategoryId} không tồn tại.");
+                    }
                 }
 
                 existingProduct.Name = productUpdateDto.Name;

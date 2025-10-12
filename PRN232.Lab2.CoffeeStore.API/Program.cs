@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,9 +100,9 @@ builder.Services.AddAuthentication(options =>
         OnTokenValidated = context =>
         {
             // Optional: log success subject/issuer for debugging
-            var sub = context.Principal?.FindFirst("sub")?.Value;
+            var sub = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var iss = context.Principal?.FindFirst("iss")?.Value;
-            Console.WriteLine($"JWT validated for sub={sub}, iss={iss}");
+            Console.WriteLine($"JWT validated for userId={sub}, iss={iss}");
             return Task.CompletedTask;
         },
         OnChallenge = context =>
@@ -109,14 +110,14 @@ builder.Services.AddAuthentication(options =>
             context.HandleResponse();
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             context.Response.ContentType = "application/json";
-            var payload = System.Text.Json.JsonSerializer.Serialize(new { success = false, data = (object?)null, error = new { message = "Unauthorized" } });
+            var payload = System.Text.Json.JsonSerializer.Serialize(new { success = false, data = (object?)null, error = new { message = "Không có quyền truy cập" } });
             return context.Response.WriteAsync(payload);
         },
         OnForbidden = context =>
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             context.Response.ContentType = "application/json";
-            var payload = System.Text.Json.JsonSerializer.Serialize(new { success = false, data = (object?)null, error = new { message = "Forbidden" } });
+            var payload = System.Text.Json.JsonSerializer.Serialize(new { success = false, data = (object?)null, error = new { message = "Bị cấm truy cập" } });
             return context.Response.WriteAsync(payload);
         }
     };

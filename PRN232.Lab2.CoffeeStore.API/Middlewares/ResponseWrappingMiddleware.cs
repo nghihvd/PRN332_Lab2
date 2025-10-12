@@ -38,7 +38,7 @@ namespace PRN232.Lab2.CoffeeStore.API.Middlewares
                 {
                     context.Response.Body = originalBodyStream;
                     context.Response.ContentType = "application/json";
-                    var wrapper401 = new { success = false, data = (object?)null, error = new { message = context.Response.StatusCode == 401 ? "Unauthorized" : "Forbidden" } };
+                    var wrapper401 = new { success = false, data = (object?)null, error = new { message = context.Response.StatusCode == 401 ? "Không có quyền truy cập" : "Bị cấm truy cập" } };
                     var json401 = JsonSerializer.Serialize(wrapper401, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
                     await context.Response.WriteAsync(json401);
                     return;
@@ -97,7 +97,7 @@ namespace PRN232.Lab2.CoffeeStore.API.Middlewares
                 context.Response.Body = originalBodyStream;
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                var error = new { success = false, error = new { message = "Internal server error", detail = ex.Message } };
+                var error = new { success = false, error = new { message = "Lỗi máy chủ nội bộ", detail = ex.Message } };
                 await context.Response.WriteAsync(JsonSerializer.Serialize(error));
             }
             finally

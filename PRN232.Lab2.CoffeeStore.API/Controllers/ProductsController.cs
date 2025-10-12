@@ -42,8 +42,19 @@ namespace PRN232.Lab2.CoffeeStore.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var product = await _productService.CreateAsync(productCreateDto);
-            return CreatedAtAction(nameof(GetById), new { id = product.ProductId }, product);
+            try
+            {
+                var product = await _productService.CreateAsync(productCreateDto);
+                return CreatedAtAction(nameof(GetById), new { id = product.ProductId }, product);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi tạo sản phẩm.", detail = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]
