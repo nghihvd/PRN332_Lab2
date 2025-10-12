@@ -46,10 +46,8 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true
             };
-            Console.WriteLine($"Debug Register - user.UserId after creation: '{user.UserId}'");
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
-            Console.WriteLine($"Debug Register - user.UserId after save: '{user.UserId}'");
 
             return await GenerateAuthResponse(user);
         }
@@ -61,7 +59,6 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
             {
                 throw new InvalidOperationException("Tên người dùng hoặc mật khẩu không đúng.");
             }
-            Console.WriteLine($"Debug Login - user.UserId: '{user.UserId}'");
             return await GenerateAuthResponse(user);
         }
 
@@ -71,25 +68,13 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
             var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
             var expires = DateTime.UtcNow.AddHours(8);
 
-            Console.WriteLine($"Debug AuthService - user.UserId: '{user.UserId}'");
-            Console.WriteLine($"Debug AuthService - user.Username: '{user.Username}'");
-            Console.WriteLine($"Debug AuthService - user.Role: '{user.Role}'");
-
-            var subClaim = new Claim(JwtRegisteredClaimNames.Sub, user.UserId);
-            var uniqueNameClaim = new Claim(JwtRegisteredClaimNames.UniqueName, user.Username);
-            var roleClaim = new Claim(ClaimTypes.Role, user.Role);
-            
-            Console.WriteLine($"Debug AuthService - subClaim.Value: '{subClaim.Value}'");
-            Console.WriteLine($"Debug AuthService - uniqueNameClaim.Value: '{uniqueNameClaim.Value}'");
-            Console.WriteLine($"Debug AuthService - roleClaim.Value: '{roleClaim.Value}'");
-
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    subClaim,
-                    uniqueNameClaim,
-                    roleClaim
+                    new Claim(JwtRegisteredClaimNames.Sub, user.UserId),
+                    new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
+                    new Claim(ClaimTypes.Role, user.Role)
                 }),
                 Expires = expires,
                 Issuer = _config["Jwt:Issuer"],
@@ -98,16 +83,6 @@ namespace PRN232.Lab2.CoffeeStore.Services.Services
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var jwt = tokenHandler.WriteToken(token);
-            
-            Console.WriteLine($"Debug AuthService - JWT Token: {jwt}");
-            
-            // Decode token để kiểm tra claims
-            var decodedToken = tokenHandler.ReadJwtToken(jwt);
-            Console.WriteLine($"Debug AuthService - Decoded token claims:");
-            foreach (var claim in decodedToken.Claims)
-            {
-                Console.WriteLine($"  {claim.Type}: {claim.Value}");
-            }
 
             return new AuthResponseModel
             {
